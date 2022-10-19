@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Application from "./Components/Application";
-import Chat from "./Components/Chat";
-import Login from "./Components/SignUp";
-import Home from "./Components/Home";
+import Application from "./Components/Application.js";
+import Chat from "./Components/Chat.js";
+import Login from "./Components/SignUp.js";
+import Home from "./Components/Home.js";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { auth } from "./Firebase/Firebase";
+import { auth } from "./Firebase/Firebase.js";
 import "./App.css";
 
 const useStyles = makeStyles((theme) => ({
