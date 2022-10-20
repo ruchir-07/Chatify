@@ -10,6 +10,9 @@ import firebase from "firebase/app";
 import ScrollableFeed from "react-scrollable-feed";
 import { BiHash } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
+import { GrEmoji } from "react-icons/gr";
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,26 +20,27 @@ const useStyles = makeStyles((theme) => ({
   },
   chat: {
     position: "relative",
-    height: "calc(100vh - 175px)",
+    height: "calc(100vh - 180px)",
     paddingLeft: "10px",
     paddingBottom: "5px",
     paddingTop: "5px",
   },
   footer: {
-    display: "flex",
-    paddingRight: "10px",
-    paddingLeft: "20px",
+    paddingRight: "15px",
+    paddingLeft: "15px",
     paddingTop: "5px",
   },
   message: {
     width: "100%",
+    color: "white",
   },
   roomName: {
-    border: "1px solid #0000002b",
+    border: "1px solid #0000004a",
     borderLeft: 0,
     borderRight: 0,
     padding: "15px",
     display: "flex",
+    color: "#e5e5e5",
   },
   roomNameText: {
     marginBlockEnd: 0,
@@ -45,6 +49,12 @@ const useStyles = makeStyles((theme) => ({
   },
   iconDesign: {
     fontSize: "1.5em",
+    color: "#e5e5e5",
+  },
+  footerContent: {
+    display: "flex",
+    backgroundColor: "#40444b",
+    borderRadius: "5px",
   },
 }));
 
@@ -54,6 +64,7 @@ function Chat() {
   const [allMessages, setAllMessages] = useState([]);
   const [channelName, setChannelName] = useState("");
   const [userNewMsg, setUserNewMsg] = useState("");
+  const [emojiBtn, setEmojiBtn] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -83,12 +94,25 @@ function Chat() {
       if (userData) {
         const displayName = userData.displayName;
         const imgUrl = userData.photoURL;
-
+        const uid = userData.uid;
+        const likeCount = 0;
+        const likes = {};
+        const fireCount = 0;
+        const fire = {};
+        const heartCount = 0;
+        const heart = {};
         const obj = {
           text: userNewMsg,
           timestamp: firebase.firestore.Timestamp.now(),
           userImg: imgUrl,
           userName: displayName,
+          uid: uid,
+          likeCount: likeCount,
+          likes: likes,
+          fireCount: fireCount,
+          fire: fire,
+          heartCount: heartCount,
+          heart: heart,
         };
 
         db.collection("channels")
@@ -98,7 +122,12 @@ function Chat() {
       }
 
       setUserNewMsg("");
+      setEmojiBtn(false);
     }
+  };
+
+  const addEmoji = (e) => {
+    setUserNewMsg(userNewMsg + e.native);
   };
 
   return (
@@ -110,33 +139,47 @@ function Chat() {
       <Grid item xs={12} className={classes.chat}>
         <ScrollableFeed>
           {allMessages.map((message) => (
-            <Messages key={message.id} values={message.data} />
+            <Messages
+              key={message.id}
+              values={message.data}
+              msgId={message.id}
+            />
           ))}
         </ScrollableFeed>
       </Grid>
-
-      <Grid item xs={12} className={classes.footer}>
-        <form
-          autoComplete="off"
-          style={{ width: "100%", display: "flex" }}
-          onSubmit={(e) => sendMsg(e)}
-        >
-          <TextField
-            className={classes.message}
-            required
-            id="outlined-basic"
-            label="Enter Message"
-            variant="outlined"
-            value={userNewMsg}
-            onChange={(e) => {
-              setUserNewMsg(e.target.value);
-            }}
-          />
-          <IconButton type="submit" color="primary" component="button">
-            <FiSend />
+      <div className={classes.footer}>
+        <Grid item xs={12} className={classes.footerContent}>
+          <IconButton
+            color="primary"
+            component="button"
+            onClick={() => setEmojiBtn(!emojiBtn)}
+          >
+            <GrEmoji style={{ color: "#b9bbbe" }} />
           </IconButton>
-        </form>
-      </Grid>
+          {emojiBtn ? <Picker onSelect={addEmoji} theme="dark" /> : null}
+
+          <form
+            autoComplete="off"
+            style={{ width: "100%", display: "flex" }}
+            onSubmit={(e) => sendMsg(e)}
+          >
+            <TextField
+              className={classes.message}
+              required
+              id="outlined-basic"
+              label="Enter Message"
+              variant="outlined"
+              value={userNewMsg}
+              onChange={(e) => {
+                setUserNewMsg(e.target.value);
+              }}
+            />
+            <IconButton type="submit" component="button">
+              <FiSend style={{ color: "#b9bbbe" }} />
+            </IconButton>
+          </form>
+        </Grid>
+      </div>
     </div>
   );
 }

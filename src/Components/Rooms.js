@@ -21,7 +21,10 @@ const useStyles = makeStyles((theme) => ({
   },
   iconDesign: {
     fontSize: "1.5em",
-    color: "#3f51b5",
+    color: "#ff4c79",
+  },
+  primary: {
+    color: "#ff4c79",
   },
 }));
 
@@ -55,7 +58,7 @@ function Rooms() {
   const addChannel = () => {
     let cName = prompt("Enter New Channel Name");
     if (cName) {
-      cName = cName.toUpperCase();
+      cName = cName.toLowerCase();
       for (var i = 0; i < channelList.length; i++) {
         if (cName === channelList[i].channelName) {
           alert(
@@ -64,7 +67,7 @@ function Rooms() {
           return;
         }
       }
-      db.collection("channels").add({ channelName: cName.toUpperCase() });
+      db.collection("channels").add({ channelName: cName.toLowerCase() });
     }
   };
 
@@ -73,7 +76,7 @@ function Rooms() {
       <ListItem style={{ paddingTop: 0, paddingBottom: 0 }}>
         <ListItemText primary="Create New Channel" />
         <IconButton edge="end" aria-label="add" onClick={addChannel}>
-          <AddIcon color="primary" />
+          <AddIcon className={classes.primary} />
         </IconButton>
       </ListItem>
       <Divider />
@@ -83,11 +86,11 @@ function Rooms() {
           <ListItemIcon>
             <IoMdChatboxes className={classes.iconDesign} />
           </ListItemIcon>
-          <ListItemText primary="Channels" />
+          <ListItemText primary="CHANNELS" style={{ color: "#8e9297" }} />
           {open ? (
-            <ExpandLess color="primary" />
+            <ExpandLess className={classes.primary} />
           ) : (
-            <ExpandMore color="primary" />
+            <ExpandMore className={classes.primary} />
           )}
         </ListItem>
 
@@ -100,10 +103,16 @@ function Rooms() {
                 className={classes.nested}
                 onClick={() => goToChannel(channel.id)}
               >
-                <ListItemIcon>
-                  <BiHash className={classes.iconDesign} />
+                <ListItemIcon style={{ minWidth: "30px" }}>
+                  <BiHash
+                    className={classes.iconDesign}
+                    style={{ color: "#b9bbbe" }}
+                  />
                 </ListItemIcon>
-                <ListItemText primary={channel.channelName} />
+                <ListItemText
+                  primary={channel.channelName}
+                  style={{ color: "#dcddde" }}
+                />
               </ListItem>
             ))}
           </List>
