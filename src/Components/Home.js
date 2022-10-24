@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     textAlign: "center",
     padding: "20px",
+    alignItems: "center",
   },
   square: {
     height: "80px",
@@ -61,14 +62,16 @@ function Home() {
   const history = useHistory();
 
   useEffect(() => {
-    db.collection("channels").onSnapshot((snapshot) => {
-      setChannels(
-        snapshot.docs.map((channel) => ({
-          channelName: channel.data().channelName,
-          id: channel.id,
-        }))
-      );
-    });
+    db.collection("channels")
+      .orderBy("channelName", "asc")
+      .onSnapshot((snapshot) => {
+        setChannels(
+          snapshot.docs.map((channel) => ({
+            channelName: channel.data().channelName,
+            id: channel.id,
+          }))
+        );
+      });
   }, []);
 
   const goToChannel = (id) => {
