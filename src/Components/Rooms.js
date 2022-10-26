@@ -11,7 +11,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Divider from "@material-ui/core/Divider";
 import AddIcon from "@material-ui/icons/Add";
 import { db } from "../Firebase/Firebase";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { IoMdChatboxes } from "react-icons/io";
 import { BiHash } from "react-icons/bi";
 import CreateRoom from "./CreateRoom";
@@ -25,10 +25,10 @@ const useStyles = makeStyles((theme) => ({
   },
   iconDesign: {
     fontSize: "1.5em",
-    color: "#ff4c79",
+    color: "#cb43fc",
   },
   primary: {
-    color: "#ff4c79",
+    color: "#cb43fc",
   },
 }));
 
@@ -37,7 +37,7 @@ function Rooms() {
   const [open, setOpen] = React.useState(true);
   const [channelList, setChannelList] = useState([]);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
-  const history = useHistory();
+  const history = useNavigate();
   const [alert, setAlert] = useState(false);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ function Rooms() {
   };
 
   const goToChannel = (id) => {
-    history.push(`/channel/${id}`);
+    history(`/channel/${id}`);
   };
 
   const manageCreateRoomModal = () => {
@@ -71,14 +71,27 @@ function Rooms() {
 
   const addChannel = (cName) => {
     if (cName) {
-      cName = cName.toLowerCase();
+      cName = cName.toLowerCase().trim();
+      if (cName === "") {
+        handleAlert();
+        return;
+      }
+
       for (var i = 0; i < channelList.length; i++) {
         if (cName === channelList[i].channelName) {
           handleAlert();
           return;
         }
       }
-      db.collection("channels").add({ channelName: cName.toLowerCase() });
+
+      db.collection("channels")
+        .add({ channelName: cName.toLowerCase() })
+        .then((res) => {
+          console.log("added new channel");
+        })
+        .then((err) => {
+          console.log(err);
+        });
     }
   };
 
@@ -92,12 +105,7 @@ function Rooms() {
         message="Room Name Already Exits!!"
         key={Fade}
         action={
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            className={classes.close}
-            onClick={handleAlert}
-          >
+          <IconButton aria-label="close" color="inherit" onClick={handleAlert}>
             <CloseIcon />
           </IconButton>
         }
@@ -143,7 +151,11 @@ function Rooms() {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary={channel.channelName}
+                  primary={
+                    channel.channelName === channel.channelName.substr(0, 12)
+                      ? channel.channelName
+                      : `${channel.channelName.substr(0, 12)}...`
+                  }
                   style={{ color: "#dcddde" }}
                 />
               </ListItem>

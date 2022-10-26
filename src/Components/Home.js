@@ -7,7 +7,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 import Avatar from "@material-ui/core/Avatar";
 import { db } from "../Firebase/Firebase";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,9 +49,9 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1.2rem",
   },
   channelCard: {
-    backgroundColor: "#6363634d",
+    backgroundColor: "#1e2439",
     boxShadow:
-      "0px 2px 4px -1px rgb(0 0 0 / 17%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)",
+      "0px 3px 4px -1px rgb(0 0 0 / 17%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)",
     color: "rgb(220, 221, 222)",
   },
 }));
@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 function Home() {
   const classes = useStyles();
   const [channels, setChannels] = useState([]);
-  const history = useHistory();
+  const history = useNavigate();
 
   useEffect(() => {
     db.collection("channels")
@@ -75,11 +75,11 @@ function Home() {
   }, []);
 
   const goToChannel = (id) => {
-    history.push(`/channel/${id}`);
+    history(`/channel/${id}`);
   };
 
   return (
-    <div style={{ backgroundColor: "#36393f" }}>
+    <div style={{ backgroundColor: "rgb(34 39 59)" }}>
       <Grid container className={classes.root}>
         <Grid item xs={12} style={{ textAlign: "center" }}>
           <Typography component="h1" className={classes.heading}>
@@ -106,7 +106,11 @@ function Home() {
                 onClick={() => goToChannel(channel.id)}
               >
                 <CardContent className={classes.channelContent}>
-                  <Avatar variant="square" className={classes.square}>
+                  <Avatar
+                    variant="square"
+                    className={classes.square}
+                    style={{ backgroundColor: "#6a9ec066" }}
+                  >
                     {channel.channelName.substr(0, 1).toUpperCase()}
                   </Avatar>
                   <Typography className={classes.channelText}>

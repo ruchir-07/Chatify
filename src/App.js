@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Application from "./Components/Application";
 import Chat from "./Components/Chat";
-import Login from "./Components/SignUp";
+import Login from "./Components/SignUp.js";
 import Home from "./Components/Home";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { auth } from "./Firebase/Firebase";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { auth, db } from "./Firebase/Firebase";
 import "./App.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    backgroundColor: "#36393f !important",
+    backgroundColor: "#22273b !important",
     height: "100vh",
   },
 }));
@@ -27,16 +27,36 @@ function App() {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        const uName = user.displayName.split(" ")[0];
-        const details = {
-          name: user.displayName,
-          displayName: uName,
-          photoURL: user.photoURL,
-          email: user.email,
-          uid: user.uid,
-        };
-        localStorage.setItem("userDetails", JSON.stringify(details));
-        setUser(user.refreshToken);
+        db.collection("users")
+          .doc(user.uid)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              console.log("user exits");
+            } else {
+              const details = {
+                name: user.displayName,
+                displayName: user.displayName.split(" ")[0],
+                photoURL: user.photoURL,
+                email: user.email,
+                uid: user.uid,
+              };
+              db.collection("users")
+                .doc(user.uid)
+                .set(details)
+                .then((res) => {
+                  console.log("new user created");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+        setUser(user.uid);
       } else {
         setUser(null);
       }
@@ -50,17 +70,13 @@ function App() {
           <Login />
         ) : (
           <div className={classes.root}>
-            <Application />
+            <Application uid={user} />
             <main className={classes.content}>
               <div className={classes.toolbar} style={{ minHeight: "50px" }} />
-              <Switch>
-                <Route path="/" exact>
-                  <Home />
-                </Route>
-                <Route path="/channel/:id">
-                  <Chat />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path="/" exact element={<Home />} />
+                <Route path="/channel/:id" element={<Chat />} />
+              </Routes>
             </main>
           </div>
         )}
